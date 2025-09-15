@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -30,18 +31,31 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        HandleCollisions();
+        HandleInput();
+        HandleAnimations(xInput);
+        HandleMovement();
+    }
+
+    private void HandleInput()
+    {
         xInput = Input.GetAxisRaw("Horizontal");
 
-        
-        isGrounded = Physics2D.Raycast(transform.position, Vector2.down, groundCheckDistance, groundLayer);
-        if (Input.GetKey(KeyCode.Space))
+
+        if (Input.GetKey(KeyCode.Space) && isGrounded)
         {
-            rb.velocity = new Vector2(rb.velocity.x, jumpForce);
+            Jump();
         }
+    }
 
-        HandleAnimations(xInput);
+    private void Jump()
+    {
+        rb.velocity = new Vector2(rb.velocity.x, jumpForce);
+    }
 
-        HandleMovement();
+    private void HandleCollisions()
+    {
+        isGrounded = Physics2D.Raycast(transform.position, Vector2.down, groundCheckDistance, groundLayer);
     }
 
     private void HandleAnimations( float xInput)
@@ -58,6 +72,8 @@ public class Player : MonoBehaviour
             }
         }
         anim.SetFloat("xVelocity", rb.velocity.x);
+        anim.SetFloat("yVelocity", rb.velocity.y);
+        anim.SetBool("isGrounded", !isGrounded);
     }
 
     private void HandleMovement()
